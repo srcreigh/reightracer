@@ -16,46 +16,6 @@ Colour addAmbientLighting() {
 	return Colour(c_ambient, c_ambient, c_ambient);
 }
 
-Colour addDiffuseLighting(Point p_surface, Vector v_normal, Light light) {
-	const double c_diffuse = 0.5;
-	Vector v_light = (light.position() - p_surface).normalize();
-	v_normal = v_normal.normalize();
-	double dot = v_light * v_normal;
-	
-	//std::cout << "Light vector: " << v_light.x() << " " << v_light.y() << " " << v_light.z() << std::endl;
-	//std::cout << "Normal vector: " << v_normal.x() << " " << v_normal.y() << " " << v_normal.z() << std::endl;
-	//if (p_surface.z() < -50) std::cout << "Surface point: " << p_surface.x() << " " << p_surface.y() << " " << p_surface.z() << std::endl;
-	
-	//std::cout << "dot product: " << dot << std::endl;
-	//if (dot > 0) std::cout << "pos" << std::endl;
-	double red = c_diffuse * dot;
-	// std::cout << "red dump: " << red << " * " << light.diffuse().red() << " = ";
-	      red *= light.diffuse().red();
-	// std::cout <<  red << std::endl;
-	double green = c_diffuse * dot;
-	      green *= light.diffuse().green();
-	double blue = c_diffuse * dot;
-	      blue *= light.diffuse().blue();
-	
-	// std::cout << "colour: " << red << " " << blue << " " << green << std::endl;
-	
-	//std::cout << std::endl;
-	return Colour(red, green, blue);
-}
-
-Colour illuminate(Point p_surface, Vector v_normal, Light lights[]) {
-	int len = 3;
-
-	Colour point_colour = addAmbientLighting();
-	
-	// diffuse lighting for each light
-	for (int i = 0; i < len; i++) {
-		point_colour = point_colour + addDiffuseLighting(p_surface, v_normal, lights[i]);
-	}
-	
-	return point_colour;
-}
-
 // boundColour: Colour Int Int -> Colour
 // Bounds a colour to be values between the min and max. If less than the
 // min, it makes the value the min, and likewise if it's more than the
@@ -77,9 +37,38 @@ Colour boundColour(Colour col, int min, int max) {
 	return Colour(tred,tgreen,tblue);
 }
 
+Colour addDiffuseLighting(Point p_surface, Vector v_normal, Light light) {
+	const double c_diffuse = 0.5;
+	Vector v_light = (light.position() - p_surface).normalize();
+	v_normal = v_normal.normalize();
+	double dot = v_light * v_normal;
+	
+	double red = c_diffuse * dot;
+	      red *= light.diffuse().red();
+	double green = c_diffuse * dot;
+	      green *= light.diffuse().green();
+	double blue = c_diffuse * dot;
+	      blue *= light.diffuse().blue();
+	
+	return boundColour(Colour(red, green, blue),0,255);
+}
+
+Colour illuminate(Point p_surface, Vector v_normal, Light lights[]) {
+	int len = 3;
+
+	Colour point_colour = addAmbientLighting();
+	
+	// diffuse lighting for each light
+	for (int i = 0; i < len; i++) {
+		point_colour = point_colour + addDiffuseLighting(p_surface, v_normal, lights[i]);
+	}
+	
+	return point_colour;
+}
+
 int main() {
-	const int height = 200;
-	const int width = 200;
+	const int height = 400;
+	const int width = 400;
 	
 	ofstream image;
 	image.open("out.ppm");
@@ -87,9 +76,9 @@ int main() {
 	
 	Point camera(0,0,0);
 	
-	Light lights [3] = { Light(Point(100,100,100), Colour(200,0,0)),
-						 Light(Point(100,-100,100), Colour(0,200,0)),
-						 Light(Point(100,0,-100), Colour(0,0,200)) };
+	Light lights [3] = { Light(Point(100,100,100), Colour(255,0,0)),
+						 Light(Point(100,0,-200), Colour(0,255,0)),
+						 Light(Point(0,-100,300), Colour(0,0,255)) };
 	
 	Colour background;
 
@@ -105,8 +94,8 @@ int main() {
 	Line ray;
 	Vector direction;
 	Colour point_colour;
-	for (int z = 100; z > -100; z--) {
-		for (int y = 100; y > -100; y--) {
+	for (double z = 100; z > -100; z-=0.5) {
+		for (double y = -100; y < 100; y+=0.5) {
 			plane_point = Point(100,y,z);
 			direction = plane_point - camera;
 
