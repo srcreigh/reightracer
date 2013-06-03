@@ -76,13 +76,13 @@ int main() {
 	
 	Point camera(0,0,0);
 	
-	Light lights [3] = { Light(Point(100,100,100), Colour(255,0,0)),
-						 Light(Point(100,0,-200), Colour(0,255,0)),
+	Light lights [3] = { Light(Point(0,0,0), Colour(255,0,0)),
+						 Light(Point(0,0,-100), Colour(0,255,0)),
 						 Light(Point(0,-100,300), Colour(0,0,255)) };
 	
 	Colour background;
 
-	Sphere sphere(Point(200,0,0),50);
+	Sphere sphere(Point(150,0,0),100);
 
 	Point plane_point;
 	Point surface_point;
